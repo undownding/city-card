@@ -8,31 +8,30 @@ function formatDatePath(date: Date) {
 }
 
 function slugifyCity(city: string) {
-  return city
+  const trimmed = city.trim();
+
+  // Prefer readable letters/numbers across scripts; collapse other chars to dashes
+  const compact = trimmed
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/[^\p{Letter}\p{Number}]+/gu, '-')
     .replace(/^-+|-+$/g, '')
-    .replace(/-{2,}/g, '-') || 'unknown-city';
-}
+    .replace(/-{2,}/g, '-')
+    .toLowerCase();
 
-function getR2PublicBaseUrl(env: CloudflareEnv) {
-  const envMap = env as unknown as Record<string, unknown>;
-  const envBaseUrl =
-    envMap.WEATHER_CARDS_PUBLIC_BASE_URL ??
-    envMap.R2_PUBLIC_BASE_URL;
+  if (compact) return compact;
 
-  if (typeof envBaseUrl === 'string' && envBaseUrl.trim().length > 0) {
-    return envBaseUrl.replace(/\/+$/, '');
-  }
+  // Deterministic ASCII fallback so we never save as unknown-city
+  const hex = Array.from(trimmed)
+    .map((ch) => ch.codePointAt(0)?.toString(16).padStart(4, '0'))
+    .join('');
 
-  return '';
+  return hex ? `u-${hex}` : 'unknown-city';
 }
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const city = searchParams.get('city');
+  const city = searchParams.get('city')?.trim();
 
   if (!city) {
     return new Response(JSON.stringify({ error: 'City parameter is required' }), {
@@ -57,10 +56,8 @@ export async function GET(request: NextRequest) {
     const citySlug = slugifyCity(city);
     const { yearMonth, day } = formatDatePath(new Date());
     const objectKey = `${yearMonth}/${day}/${citySlug}.webp`;
-    const r2PublicBaseUrl = getR2PublicBaseUrl(env);
-    const imageUrl = r2PublicBaseUrl
-      ? `${r2PublicBaseUrl}/${objectKey}`
-      : `/r2/${objectKey}`;
+    const encodedKey = objectKey.split('/').map(encodeURIComponent).join('/');
+    const imageUrl = `https://card-r2.undownding.dev/${encodedKey}`;
 
     const existingObject = await cardsBucket.head(objectKey);
     if (existingObject) {
