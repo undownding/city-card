@@ -79,6 +79,15 @@ npm run deploy
 
 或通过 Cloudflare Pages 控制台手动部署。
 
+## 项目截图
+
+### 主界面
+![主界面截图](https://via.placeholder.com/800x600?text=City+Card+Main+Interface)
+
+### 天气卡片示例
+![北京天气卡片](https://via.placeholder.com/800x1200?text=Beijing+Weather+Card)
+![上海天气卡片](https://via.placeholder.com/800x1200?text=Shanghai+Weather+Card)
+
 ## 使用方法
 
 1. 打开应用后，浏览器会请求地理位置权限
@@ -98,14 +107,26 @@ npm run deploy
 **接口**：`GET /api/image?city=<城市名称>`
 
 **参数**：
-- `city`：城市名称（必填）
+- `city`：城市名称（必填），支持中文、英文等多种语言
 
-**响应**：
+**成功响应**：
 ```json
 {
   "imageUrl": "https://card-r2.undownding.dev/2024-02/27/beijing.webp"
 }
 ```
+
+**错误响应**：
+```json
+{
+  "error": "City parameter is required"
+}
+```
+
+**状态码**：
+- 200：成功
+- 400：参数缺失或无效
+- 500：服务器内部错误
 
 **示例**：
 ```bash
@@ -117,19 +138,36 @@ curl "http://localhost:3000/api/image?city=北京"
 **接口**：`GET /api/reverse-geocode?lat=<纬度>&lon=<经度>`
 
 **参数**：
-- `lat`：纬度（必填）
-- `lon`：经度（必填）
+- `lat`：纬度（必填），范围：-90 到 90
+- `lon`：经度（必填），范围：-180 到 180
 
-**响应**：
+**成功响应**：
 ```json
 {
   "address": {
     "city": "北京",
     "town": null,
-    "village": null
+    "village": null,
+    "country": "中国",
+    "country_code": "cn",
+    "postcode": "100000",
+    "state": "北京市"
   }
 }
 ```
+
+**错误响应**：
+```json
+{
+  "error": "lat and lon parameters are required"
+}
+```
+
+**状态码**：
+- 200：成功
+- 400：参数缺失或无效
+- 500：服务器内部错误
+- 502：第三方 API 服务错误
 
 **示例**：
 ```bash
@@ -157,6 +195,85 @@ curl "http://localhost:3000/api/reverse-geocode?lat=39.9042&lon=116.4074"
 └── package.json              # 项目依赖
 ```
 
+## 故障排除指南
+
+### 常见问题
+
+#### 1. 地理位置权限被拒绝
+
+**症状**：显示错误信息“您拒绝了位置请求”
+
+**解决方法**：
+- 刷新页面，重新允许地理位置权限
+- 检查浏览器设置，确保地理位置权限未被全局禁用
+- 尝试使用其他浏览器
+
+#### 2. 无法获取城市信息
+
+**症状**：显示错误信息“无法获取城市信息”
+
+**解决方法**：
+- 检查网络连接
+- 确认设备的 GPS 功能正常
+- 尝试刷新页面重试
+
+#### 3. 天气卡片生成失败
+
+**症状**：显示错误信息“无法获取天气卡片图片”
+
+**解决方法**：
+- 检查网络连接
+- 刷新页面重试
+- 确认 Cloudflare AI Gateway 配置正确
+- 检查 Google AI Studio API 密钥是否有效（如使用直接 API 访问）
+
+#### 4. 本地开发环境问题
+
+**症状**：无法启动开发服务器或 API 无法正常工作
+
+**解决方法**：
+- 确认 Node.js 版本 >= 18.0.0
+- 删除 `node_modules` 并重新安装依赖：
+  ```bash
+  rm -rf node_modules package-lock.json
+  npm install
+  ```
+- 检查 `.dev.vars` 文件中的环境变量配置是否正确
+
+## 开发环境常见问题
+
+### 1. Cloudflare 资源绑定错误
+
+**错误信息**：`Error: WEATHER_CARDS_R2_BUCKET is not available`
+
+**解决方法**：
+- 确认 `wrangler.jsonc` 中已正确配置资源绑定
+- 检查 `.dev.vars` 文件中的桶名称是否正确
+- 确认 Cloudflare R2 存储桶已创建
+
+### 2. AI Gateway 连接问题
+
+**错误信息**：`Error: AI instance not available`
+
+**解决方法**：
+- 确认 Cloudflare AI Gateway 配置正确
+- 检查 `wrangler.jsonc` 中的 `ai` 资源绑定
+- 确认 AI Gateway 服务可用
+
+### 3. 构建失败
+
+**错误信息**：构建过程中出现各种错误
+
+**解决方法**：
+- 清理构建缓存：
+  ```bash
+  rm -rf .next .open-next dist
+  ```
+- 重新构建：
+  ```bash
+  npm run build
+  ```
+
 ## 开发指南
 
 ### 添加新功能
@@ -177,6 +294,64 @@ npm run lint
 
 - 使用 `npm run build` 生成生产版本
 - 构建产物会自动优化以提高性能
+
+## 贡献指南
+
+### 提交规范
+
+请遵循以下提交消息格式：
+
+```
+type(scope): description
+
+body (optional)
+
+footer (optional)
+```
+
+**类型（type）**：
+- feat：新功能
+- fix：修复 bug
+- docs：文档更新
+- style：代码格式调整（不影响功能）
+- refactor：代码重构
+- test：测试相关
+- chore：构建过程或辅助工具的变动
+
+**范围（scope）**：
+- api：API 路由
+- ui：用户界面
+- config：配置文件
+- deps：依赖更新
+
+**示例**：
+```
+feat(api): 添加天气卡片缓存机制
+
+添加 Redis 缓存支持，提高天气卡片获取速度
+
+Closes #123
+```
+
+### 开发流程
+
+1. Fork 仓库
+2. 创建特性分支：`git checkout -b feat/your-feature`
+3. 提交更改：`git commit -m "feat: 添加新功能"`
+4. 推送到分支：`git push origin feat/your-feature`
+5. 创建 Pull Request
+
+### 代码规范
+
+- 使用 TypeScript 进行开发
+- 遵循 ESLint 规则
+- 使用 Prettier 格式化代码
+- 保持代码简洁和可读性
+- 为关键函数添加类型注解
+
+## 许可证
+
+MIT License
 
 ## 许可证
 
