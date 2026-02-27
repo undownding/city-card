@@ -135,7 +135,6 @@ city_slug examples: 杭州→hangzhou, 东京→tokyo, 巴黎→paris, New York�
     }
 
     const data: any = await response.json();
-    console.log('AI Gateway Response:', JSON.stringify(data, null, 2));
 
     // 处理响应
     const candidate = data.candidates?.[0];
