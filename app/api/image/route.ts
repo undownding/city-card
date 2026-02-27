@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
           role: 'user',
           parts: [
             {
-              prompt: `
+              text: `
               You have access to Google Search. Search for today's real-time weather in "${city}", then generate a weather card image.
 
 Image style:
