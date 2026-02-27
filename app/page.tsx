@@ -77,7 +77,7 @@ export default function Home() {
   const getCityFromCoordinates = async (latitude: number, longitude: number): Promise<string> => {
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`
+        `/api/reverse-geocode?lat=${encodeURIComponent(latitude)}&lon=${encodeURIComponent(longitude)}`
       );
       if (!response.ok) {
         throw new Error('Failed to fetch location data');
