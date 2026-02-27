@@ -108,6 +108,7 @@ city_slug examples: 杭州→hangzhou, 东京→tokyo, 巴黎→paris, New York�
       ],
       generationConfig: {
         responseModalities: ['IMAGE'],
+        tools: [{ googleSearch: {} }],
         thinkingConfig: {
           includeThoughts: false
         },
