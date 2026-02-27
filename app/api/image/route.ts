@@ -70,7 +70,6 @@ export async function GET(request: NextRequest) {
     }
 
     const gateway = ai.gateway('ai-gallery');
-    const gatewayBaseUrl = await gateway.getUrl('google-ai-studio');
     const endpoint = 'v1beta/models/gemini-3.1-flash-image-preview:generateContent';
 
     const requestBody = {
@@ -122,12 +121,13 @@ city_slug examples: 杭州→hangzhou, 东京→tokyo, 巴黎→paris, New York�
       }
     };
 
-    const response = await fetch(`${gatewayBaseUrl}/${endpoint}`, {
-      method: 'POST',
+    const response = await gateway.run({
+      provider: 'google-ai-studio',
+      endpoint,
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(requestBody)
+      query: requestBody
     });
 
     if (!response.ok) {
