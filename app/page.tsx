@@ -2,16 +2,9 @@
 
 import { useState, useEffect } from 'react';
 
-type ReverseGeocodeResponse = {
-  address?: {
-    city?: string;
-    town?: string;
-    village?: string;
-  };
-};
-
 type WeatherImageResponse = {
   imageUrl?: string;
+  city?: string;
 };
 
 export default function Home() {
@@ -21,92 +14,31 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // 获取当前位置
-    const getCurrentLocation = () => {
-      if (!navigator.geolocation) {
-        setError('您的浏览器不支持地理定位');
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          try {
-            // 通过坐标获取城市名称
-            const cityName = await getCityFromCoordinates(
-              position.coords.latitude,
-              position.coords.longitude
-            );
-            setCity(cityName);
-
-            // 获取天气卡片图片
-            await fetchWeatherImage(cityName);
-          } catch (err) {
-            setError('无法获取城市信息');
-            console.error(err);
-          } finally {
-            setLoading(false);
-          }
-        },
-        (geoError) => {
-          let errorMessage = '获取位置失败';
-          switch (geoError.code) {
-            case geoError.PERMISSION_DENIED:
-              errorMessage = '您拒绝了位置请求';
-              break;
-            case geoError.POSITION_UNAVAILABLE:
-              errorMessage = '位置信息不可用';
-              break;
-            case geoError.TIMEOUT:
-              errorMessage = '位置请求超时';
-              break;
-          }
-          setError(errorMessage);
-          setLoading(false);
+    // 直接获取天气卡片图片
+    const fetchWeatherImage = async () => {
+      try {
+        const response = await fetch('/api/image');
+        if (!response.ok) {
+          throw new Error('Failed to fetch weather image');
         }
-      );
+        const data = (await response.json()) as WeatherImageResponse;
+        if (!data.imageUrl) {
+          throw new Error('Image URL missing in response');
+        }
+        setImageUrl(data.imageUrl);
+        if (data.city) {
+          setCity(data.city);
+        }
+      } catch (error) {
+        console.error('Error fetching weather image:', error);
+        setError('无法获取天气卡片图片');
+      } finally {
+        setLoading(false);
+      }
     };
 
-    getCurrentLocation();
+    fetchWeatherImage();
   }, []);
-
-  // 通过坐标获取城市名称
-  const getCityFromCoordinates = async (latitude: number, longitude: number): Promise<string> => {
-    try {
-      const response = await fetch(
-        `/api/reverse-geocode?lat=${encodeURIComponent(latitude)}&lon=${encodeURIComponent(longitude)}`
-      );
-      if (!response.ok) {
-        throw new Error('Failed to fetch location data');
-      }
-      const data = (await response.json()) as ReverseGeocodeResponse;
-      return data.address?.city || data.address?.town || data.address?.village || 'Unknown';
-    } catch (error) {
-      console.error('Error getting city from coordinates:', error);
-      throw error;
-    }
-  };
-
-  // 获取天气卡片图片
-  const fetchWeatherImage = async (cityName: string) => {
-    try {
-      const response = await fetch(`/api/image?city=${encodeURIComponent(cityName)}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch weather image');
-      }
-      const data = (await response.json()) as WeatherImageResponse;
-      if (!data.imageUrl) {
-        throw new Error('Image URL missing in response');
-      }
-      setImageUrl(data.imageUrl);
-    } catch (error) {
-      console.error('Error fetching weather image:', error);
-      setError('无法获取天气卡片图片');
-    }
-  };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100">

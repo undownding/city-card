@@ -30,11 +30,12 @@ function slugifyCity(city: string) {
 }
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const city = searchParams.get('city')?.trim();
+  const { cf } = await getCloudflareContext({ async: true });
+
+  const city = cf?.city;
 
   if (!city) {
-    return new Response(JSON.stringify({ error: 'City parameter is required' }), {
+    return new Response(JSON.stringify({ error: 'City information not available from Cloudflare' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
@@ -61,7 +62,7 @@ export async function GET(request: NextRequest) {
 
     const existingObject = await cardsBucket.head(objectKey);
     if (existingObject) {
-      return new Response(JSON.stringify({ imageUrl }), {
+      return new Response(JSON.stringify({ imageUrl, city }), {
         headers: { 'Content-Type': 'application/json' }
       });
     }
@@ -160,7 +161,7 @@ city_slug examples: 杭州→hangzhou, 东京→tokyo, 巴黎→paris, New York�
       }
     });
 
-    return new Response(JSON.stringify({ imageUrl }), {
+    return new Response(JSON.stringify({ imageUrl, city }), {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
