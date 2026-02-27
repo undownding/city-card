@@ -70,6 +70,7 @@ export async function GET(request: NextRequest) {
     const endpoint = 'v1beta/models/gemini-3.1-flash-image-preview:generateContent';
 
     const requestBody = {
+      tools: [{ googleSearch: {} }],
       contents: [
         {
           role: 'user',
@@ -108,7 +109,6 @@ city_slug examples: 杭州→hangzhou, 东京→tokyo, 巴黎→paris, New York�
       ],
       generationConfig: {
         responseModalities: ['IMAGE'],
-        tools: [{ googleSearch: {} }],
         thinkingConfig: {
           includeThoughts: false
         },
