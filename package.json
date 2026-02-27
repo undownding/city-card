@@ -1,0 +1,37 @@
+{
+  "name": "city-card",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "start": "next start",
+    "lint": "next lint",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@opennextjs/cloudflare": "^1.17.1",
+    "next": "16.1.6",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/node": "^22.13.5",
+    "@types/react": "^19.2.4",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.17.0",
+    "eslint-config-next": "16.1.6",
+    "globals": "^15.14.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.0",
+    "typescript": "~5.6.2",
+    "typescript-eslint": "^8.18.2",
+    "wrangler": "^4.69.0"
+  }
+}
