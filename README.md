@@ -82,11 +82,11 @@ npm run deploy
 ## 项目截图
 
 ### 主界面
-![主界面截图](https://via.placeholder.com/800x600?text=City+Card+Main+Interface)
+![主界面截图](example/project.png)
 
 ### 天气卡片示例
-![北京天气卡片](https://via.placeholder.com/800x1200?text=Beijing+Weather+Card)
-![上海天气卡片](https://via.placeholder.com/800x1200?text=Shanghai+Weather+Card)
+![北京天气卡片](example/beijing.png)
+![上海天气卡片](example/shanghai.png)
 
 ## 使用方法
 
