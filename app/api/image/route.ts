@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
     }
 
     const gateway = ai.gateway('ai-gallery');
-    const endpoint = '/v1beta/models/gemini-3-pro-image-preview:generateContent';
+    const endpoint = '/v1beta/models/gemini-3.1-flash-image-preview:generateContent';
 
     const requestBody = {
       tools: [{ googleSearch: {} }],
