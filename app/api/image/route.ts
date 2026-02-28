@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
     }
 
     const gateway = ai.gateway('ai-gallery');
-    const endpoint = 'v1beta/models/gemini-3.1-flash-image-preview:generateContent';
+    const endpoint = 'v1beta/models/gemini-3-pro-image-preview';
 
     const requestBody = {
       tools: [{ googleSearch: {} }],
@@ -121,7 +121,7 @@ city_slug examples: 杭州→hangzhou, 东京→tokyo, 巴黎→paris, New York�
     };
 
     const response = await gateway.run({
-      provider: 'google-ai-studio',
+      provider: 'custom-awsl',
       endpoint,
       headers: {
         'Content-Type': 'application/json'
