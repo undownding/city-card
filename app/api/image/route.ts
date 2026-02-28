@@ -121,7 +121,7 @@ city_slug examples: 杭州→hangzhou, 东京→tokyo, 巴黎→paris, New York�
     };
 
     const response = await gateway.run({
-      provider: 'custom-awsl',
+      provider: 'cawsl',
       endpoint,
       headers: {
         'Content-Type': 'application/json'
