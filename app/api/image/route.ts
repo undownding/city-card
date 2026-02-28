@@ -115,13 +115,13 @@ city_slug examples: 杭州→hangzhou, 东京→tokyo, 巴黎→paris, New York�
         },
         imageConfig: {
           aspectRatio: '1:1',
-          imageSize: '2k'
+          imageSize: '1k'
         }
       }
     };
 
     const response = await gateway.run({
-      provider: 'custom-providers/custom-awsl',
+      provider: 'google-ai-studio',
       endpoint,
       headers: {
         'Content-Type': 'application/json'
